@@ -24,7 +24,7 @@ def automated():
         result = DE_Current_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
     else:
         return jsonify({"status": 400, "message": "Your request method has not accepted!"}), 400
-    return jsonify({"status": 200, "result": result, "message": "Successfuly!"}), 200
+    return jsonify({"status": 200, "result": result.best_all, "compressor_result": result.K, "message": "Successfuly!"}), 200
   except Exception as e:
     return jsonify({"error": str(e), "status": 500, "message": "Data failed to automated!"}), 500
 

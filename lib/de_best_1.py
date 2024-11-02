@@ -103,17 +103,17 @@ class DE_Best_1:
         return best_b1_b3
 
 
-    def mutation(x, F):
-        return np.add(x[0], np.add(np.multiply(F, np.subtract(x[1], x[2])), np.multiply(F, np.subtract(x[3], x[4]))))
+    def mutation(self, x):
+        return np.add(x[0], np.add(np.multiply(self.F, np.subtract(x[1], x[2])), np.multiply(self.F, np.subtract(x[3], x[4]))))
 
     # Fungsi untuk Crossover
     # Input : mutated vector, target pipe, dimensi dari pipe = 7, dan CR
     # Output : trial vector
-    def crossover(mutated, target, dims, cr):
+    def crossover(self, mutated, target, dims):
         # Generate uniform random value untuk setiap dimension
         p = np.random.rand(dims)
         # Generate Trial Vector dari binomial crossover
-        trial = [mutated[i] if p[i] < cr else target[i] for i in range(dims)]
+        trial = [mutated[i] if p[i] < self.CR else target[i] for i in range(dims)]
         return trial
 
     # Fungsi untuk mengecek batasan dari pd, ps, L, D pada tiap pipe dari 1 set pipe
@@ -235,7 +235,7 @@ class DE_Best_1:
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
                     d, e = pop_pipe[np.random.choice(candidates, 2, replace=False)]
                     # Perform mutation
-                    mutated = self.mutation([a, b, c, d, e], self.F)
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated_b1 = self.check_bounds(mutated[:3], self.bounds[0])
                     mutated_b2 = self.check_bounds(mutated[3:], self.bounds[1])
@@ -249,7 +249,7 @@ class DE_Best_1:
                 # CROSSOVER
                 # Perform crossover
                 while(True):
-                    trial = np.array(self.crossover(mutated, pop_pipe[j], self.N1 + self.N2, self.CR))
+                    trial = np.array(self.crossover(mutated, pop_pipe[j], self.N1 + self.N2))
                     if self.check_length1(trial):
                         break
 
@@ -339,7 +339,7 @@ class DE_Best_1:
                     candidates = [candidate for candidate in range(self.pop_size) if candidate != j]
                     d, e = pop_pipe[np.random.choice(candidates, 2, replace=False)]
                     # Perform mutation
-                    mutated = self.mutation([a, b, c, d, e], self.F)
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated = self.check_bounds(mutated, self.bounds3)
                     # Check inequality const
@@ -353,7 +353,7 @@ class DE_Best_1:
                 while(True):
                     mutated_temp = np.concatenate((best_b1, mutated))
                     target_temp = np.concatenate((best_b1, pop_pipe[j]))
-                    trial = np.array(self.crossover(mutated_temp, target_temp, self.N1 + self.N3, self.CR))
+                    trial = np.array(self.crossover(mutated_temp, target_temp, self.N1 + self.N3))
                     if self.check_length2(trial):
                         break
 
