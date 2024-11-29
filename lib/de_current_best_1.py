@@ -42,7 +42,6 @@ class DE_Current_Best_1:
         best_b1_b3 = self.get_best_b1_b3()
         self.best_all = np.concatenate((best_b1_b2[0],best_b1_b3[0][3:]))
         self.K = self.get_k()
-<<<<<<< HEAD
         self.display()
         self.display_comp_ratio()
     
@@ -69,11 +68,6 @@ class DE_Current_Best_1:
             print('Compressor {0} : {1}'.format(i + 1, k))
     
     def get_k(self):
-=======
-    
-    def get_k(self):
-        # TODO 1. Hitung K
->>>>>>> df152ad930de449714b4dad8fb7f8867d2dae28f
         K = []
 
         for i in range(len(self.best_all)-1):
@@ -83,7 +77,6 @@ class DE_Current_Best_1:
         return K
     
     def get_best_b1_b3(self):
-<<<<<<< HEAD
         threshold_error = 0.05
         while(True):
             best_pipe_b3 = self.create_pipe_b3()
@@ -111,18 +104,6 @@ class DE_Current_Best_1:
             else :
                 print("check_inequality_2 tidak terpenuhi")          
            
-=======
-        best_b1 = self.get_best_b1()
-        while(True):
-            best_pipe_b3 = self.create_pipe_b3()
-            best_b1_b3 = self.diff_evol_2(best_pipe_b3, best_b1, self.bounds3, len(best_pipe_b3))
-            status = False
-            if(round(best_b1_b3[0][self.N1 + self.N3-1][1]) == self.ps2):
-                status = True
-            if status and (best_b1_b3[0][:3] == best_b1).all() and self.check_inequality_2(best_b1_b3[0]):
-                break
-            
->>>>>>> df152ad930de449714b4dad8fb7f8867d2dae28f
         return best_b1_b3
     
     def diff_evol_2(self, pop_pipe_b3, best_b1, bounds, pop_size):
@@ -243,17 +224,13 @@ class DE_Current_Best_1:
         return best_b1
     
     def get_best_b1_b2(self):
-<<<<<<< HEAD
         threshold_error = 0.05
-=======
->>>>>>> df152ad930de449714b4dad8fb7f8867d2dae28f
         best_pipe_b1_b2 = self.get_best_pipe_b1_b2()
         # Proses Differential Evolution hingga memenuhi setiap constraint
         # Hingga memenuhi Ps demand 1 = 600 psi
         while(True):
             best_b1_b2 = self.diff_evol1(best_pipe_b1_b2, len(best_pipe_b1_b2))
             status = False
-<<<<<<< HEAD
             
             current_value = best_b1_b2[0][self.N1 + self.N2 - 1][1]
             error_rel = abs(current_value - self.ps1) / self.ps1
@@ -275,12 +252,6 @@ class DE_Current_Best_1:
         self.best_b1 = self.get_best_b1()
         print(self.best_b1)    
         return self.best_b1_b2
-=======
-            if(round(best_b1_b2[0][self.N1 + self.N2 - 1][1]) == self.ps1 and self.check_inequality_2(best_b1_b2[0])):
-                break
-            print(best_b1_b2)
-        return best_b1_b2
->>>>>>> df152ad930de449714b4dad8fb7f8867d2dae28f
     
     # Fungsi differential evolution untuk pipe branch 1 dan branch 2
     def diff_evol1(self, pop_pipe, pop_size):
@@ -474,9 +445,4 @@ class DE_Current_Best_1:
     # Input : target pipe dan F
     # Output : mutated vector
     def mutation(self, x):
-<<<<<<< HEAD
         return np.add(x[0], np.add(np.multiply(self.F, np.subtract(x[1], x[2])), np.multiply(self.F, np.subtract(x[3], x[4]))))
-
-=======
-        return np.add(x[0], np.add(np.multiply(self.F, np.subtract(x[1], x[2])), np.multiply(self.F, np.subtract(x[3], x[4]))))
->>>>>>> df152ad930de449714b4dad8fb7f8867d2dae28f
