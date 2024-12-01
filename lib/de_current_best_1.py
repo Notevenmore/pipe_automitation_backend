@@ -41,11 +41,12 @@ class DE_Current_Best_1:
         best_b1_b2 = self.get_best_b1_b2()
         best_b1_b3 = self.get_best_b1_b3()
         self.best_all = np.concatenate((best_b1_b2[0],best_b1_b3[0][3:]))
+        Q = np.array(self.get_q())
+        self.best_all = np.concatenate((self.best_all, Q.reshape(-1, 1)), axis=1)
         self.K = self.get_k()
-        self.Q = self.get_q()
         self.cost = self.f(self.best_all, self.n, self.m)
         print(self.best_all)
-        print(self.Q)
+        print(Q)
         print(self.cost)
     
     def get_q(self):
