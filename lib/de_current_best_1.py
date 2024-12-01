@@ -41,32 +41,23 @@ class DE_Current_Best_1:
         best_b1_b2 = self.get_best_b1_b2()
         best_b1_b3 = self.get_best_b1_b3()
         self.best_all = np.concatenate((best_b1_b2[0],best_b1_b3[0][3:]))
+        Q = np.array(self.get_q())
+        self.best_all = np.concatenate((self.best_all, Q.reshape(-1, 1)), axis=1)
         self.K = self.get_k()
-        self.display()
-        self.display_comp_ratio()
+        self.cost = self.f(self.best_all, self.n, self.m)
+        print(self.best_all)
+        print(Q)
+        print(self.cost)
     
-    def display(self) :   
-        print('Best vector setiap branch:')
-        print('\t|     Pd     |     Ps     |     L       |      D      |        Q         |')
-        for i in range(11):
-            print('Pipe {0}: {1}'.format(i+1, self.best_all[i]),end="")
-            if round(self.best_all[i][1]) == self.ps1:ps1 = i
-            if round(self.best_all[i][1]) == self.ps2:ps2 = i
-            print(' ',self.q(self.best_all[i][0],self.best_all[i][1],self.best_all[i][2],self.best_all[i][3])/1000000)
-            if i == 2 or i == 6 or i == 10:
-                print('---------------------------------')
-        print('Ps = 600 terpenuhi pada pipe ke:',ps1+1)
-        print('Ps = 300 terpenuhi pada pipe ke:',ps2+1)
-        print('---------------------------------')
-        print('F(x) = {0}'.format(self.f(self.best_all, self.n, self.m)))
+    def get_q(self):
+        qi = []
         
-    def display_comp_ratio(self):
-        print("===========================")
-        print('Compressor Ratio')
-        self.get_k()
-        for i, k in enumerate(self.K):
-            print('Compressor {0} : {1}'.format(i + 1, k))
-    
+        for i in range(len(self.best_all)):
+            qi.append(self.q(self.best_all[i][0], self.best_all[i][1], self.best_all[i][2], self.best_all[i][3]) / 1000000)
+            
+        return qi
+            
+           
     def get_k(self):
         K = []
 
@@ -98,13 +89,14 @@ class DE_Current_Best_1:
                 
                 print(best_b1_b3)
                 if status and (best_b1_b3[0][:3] == self.best_b1).all():
+                    self.best_b1_b3 = best_b1_b3
                     print("--------break here----------")
                     break   
                 
             else :
                 print("check_inequality_2 tidak terpenuhi")          
            
-        return best_b1_b3
+        return self.best_b1_b3
     
     def diff_evol_2(self, pop_pipe_b3, best_b1, bounds, pop_size):
         # Check inequality branch 3
@@ -375,12 +367,14 @@ class DE_Current_Best_1:
     # Input: 1 set pipe (pipe1, pipe2, ..., pipei), jumlah compressor, jumlah pipe
     # Output: sum fungsi objektif
     def f(self, pop, n, m):
-        sum = 0
+        sum_comp = 0
         for i in range(n):
-            qi = self.q(pop[i][0],pop[i][1],pop[i][2],pop[i][3])/1000000
-            sum += self.f_comp(pop[i], qi)
-            for j in range(m):
-                sum += self.f_pipe(pop[j])
+            qi = self.q(pop[i][0], pop[i][1], pop[i][2], pop[i][3]) / 1000000
+            sum_comp += self.f_comp(pop[i], qi)
+        sum_pipe = 0
+        for j in range(m):
+            sum_pipe += self.f_pipe(pop[j])
+        sum = sum_comp + sum_pipe
         return sum
 
     # Fungsi Q untuk menghitung Flow Rate

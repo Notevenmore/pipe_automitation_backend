@@ -1,0 +1,12 @@
+### Automated
+POST http://localhost:8000/automated
+Content-Type: application/json
+
+{
+  "ps": 500,
+  "length_b1_b2": 175,
+  "length_b1_b3": 200,
+  "ps1": 600,
+  "ps2": 300,
+  "requested": "de_current_best_1"
+}

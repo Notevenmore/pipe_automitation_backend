@@ -6,6 +6,7 @@ from pydantic import BaseModel
 app = FastAPI()
 origins = [
   "http://localhost:3000",
+  "http://localhost:8000", # for testing purposes
 ]
 
 app.add_middleware(
@@ -50,6 +51,7 @@ async def automated(data: Requested):
       #   result = DE_Current_Rand_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
       else:
         raise HTTPException(status_code=400, detail="Your request method has not been accepted!")
-      return {"best_all": result.best_all, "k": result.K}
+      return {"best_all": result.best_all, "k": result.K, "cost": result.cost}
     except Exception as e:
-      raise HTTPException(status_code=500, detail="Internal Server Error", error=e)
+      print(f"Error occurred: {str(e)}")
+      raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
