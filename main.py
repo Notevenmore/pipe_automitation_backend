@@ -51,7 +51,7 @@ async def automated(data: Requested):
       #   result = DE_Current_Rand_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
       else:
         raise HTTPException(status_code=400, detail="Your request method has not been accepted!")
-      return {"best_all": result.best_all, "k": result.K, "cost": result.cost}
+      return {"best_all": result.best_all, "k": result.K, "Q": result.Q, "cost": result.cost}
     except Exception as e:
       print(f"Error occurred: {str(e)}")
       raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

@@ -42,10 +42,21 @@ class DE_Current_Best_1:
         best_b1_b3 = self.get_best_b1_b3()
         self.best_all = np.concatenate((best_b1_b2[0],best_b1_b3[0][3:]))
         self.K = self.get_k()
+        self.Q = self.get_q()
         self.cost = self.f(self.best_all, self.n, self.m)
         print(self.best_all)
+        print(self.Q)
         print(self.cost)
-       
+    
+    def get_q(self):
+        qi = []
+        
+        for i in range(len(self.best_all)):
+            qi.append(self.q(self.best_all[i][0], self.best_all[i][1], self.best_all[i][2], self.best_all[i][3]) / 1000000)
+            
+        return qi
+            
+           
     def get_k(self):
         K = []
 
