@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from lib import DE_Best_1, DE_Best_2, DE_Current_Best_1
+from lib import DE_Best_1, DE_Best_2, DE_Current_Best_1, DE_Current_Rand_1, DE_Rand_1_Origin, DE_Rand_2, DE_Rand_Best_1
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -36,13 +36,19 @@ async def automated(data: Requested):
     requested = data.requested
     try:
       if(requested == "de_best_1"):
-        result = DE_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
+        result = DE_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
       elif(requested == "de_best_2"):
-        result = DE_Best_2(ps, length_b1_b2, length_b1_b3, ps1, ps2)
+        result = DE_Best_2(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
       elif(requested == "de_current_best_1"):
-        result = DE_Current_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
-      # elif(requested == "de_current_rand_1"):
-      #   result = DE_Current_Rand_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
+        result = DE_Current_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
+      elif(requested == "de_current_rand_1"):
+        result = DE_Current_Rand_1(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
+      elif(requested == "de_rand_1_origin"):
+        result = DE_Rand_1_Origin(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
+      elif(requested == "de_rand_2"):
+        result = DE_Rand_2(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
+      elif(requested == "de_rand_best_1"):
+        result = DE_Rand_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2) # Testing succeed
       else:
         raise HTTPException(status_code=400, detail="Your request method has not been accepted!")
       return {"best_all": result.best_all, "k": result.K, "cost": result.cost}

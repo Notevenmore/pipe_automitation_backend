@@ -1,5 +1,5 @@
 import numpy as np
-class DE_Best_1:
+class DE_Rand_1_Origin:
     def __init__(self, ps, length_b1_b2, length_b1_b3, ps1, ps2):
         # Definisi parameter untuk Differential Evolution
         # ------------------------------
@@ -118,10 +118,9 @@ class DE_Best_1:
                 # MUTATION
                 while(True):
                     # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]# Perform mutation
+                    a, b, c = pop_pipe[np.random.choice(candidates, 3, replace=False)]
+                    # Perform mutation
                     mutated = self.mutation([a, b, c])
                     # Check bound mutated vector
                     mutated = self.check_bounds(mutated, bounds)
@@ -263,10 +262,8 @@ class DE_Best_1:
                 # MUTATION
                 while(True):
                     # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]
+                    a, b, c = pop_pipe[np.random.choice(candidates, 3, replace=False)]
                     # Perform mutation
                     mutated = self.mutation([a, b, c])
                     # Check bound mutated vector

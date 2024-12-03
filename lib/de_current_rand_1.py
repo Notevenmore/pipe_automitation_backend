@@ -1,5 +1,5 @@
 import numpy as np
-class DE_Best_1:
+class DE_Current_Rand_1:
     def __init__(self, ps, length_b1_b2, length_b1_b3, ps1, ps2):
         # Definisi parameter untuk Differential Evolution
         # ------------------------------
@@ -56,9 +56,9 @@ class DE_Best_1:
             qi.append(self.q(self.best_all[i][0], self.best_all[i][1], self.best_all[i][2], self.best_all[i][3]) / 1000000)
             
         return qi
-    
+            
+           
     def get_k(self):
-        # TODO 1. Hitung K
         K = []
 
         for i in range(len(self.best_all)-1):
@@ -102,10 +102,10 @@ class DE_Best_1:
         # Check inequality branch 3
         pop_pipe = [self.check_inequality(p) for p in pop_pipe_b3]
         pop_pipe = np.array(pop_pipe)
-        
+
         # Evaluate initial population candidate solution
         temp = [np.concatenate((best_b1, p)) for p in pop_pipe_b3]
-        obj_all = [self.f(p, self.N1+self.N3, self.N1+self.N3) for p in temp]
+        obj_all = [self.f(p, self.N1 + self.N3, self.N1 + self.N3) for p in temp]
 
         # Find the best vector of initial population
         best_vector = pop_pipe[np.argmin(obj_all)]
@@ -118,16 +118,18 @@ class DE_Best_1:
                 # MUTATION
                 while(True):
                     # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
+                    a = pop_pipe[j] # current
+                    c = pop_pipe[j] # current
+                    # Choose 5 candidate solution : a, b, c, d, e
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]# Perform mutation
-                    mutated = self.mutation([a, b, c])
+                    d, e, b = pop_pipe[np.random.choice(candidates, 3, replace=False)]
+                    # Perform mutation
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated = self.check_bounds(mutated, bounds)
                     # Check inequality const
                     mutated = self.check_inequality(mutated)
-                    # Check lenght, if true continue, else LOOP UNTIL 
+                    # Check lenght, if true continue, else LOOP UNTIL
                     temp = np.concatenate((best_b1, mutated))
                     if self.check_length2(temp):
                         break
@@ -136,14 +138,14 @@ class DE_Best_1:
                 while(True):
                     mutated_temp = np.concatenate((best_b1, mutated))
                     target_temp = np.concatenate((best_b1, pop_pipe[j]))
-                    trial = np.array(self.crossover(mutated_temp, target_temp, self.N1+self.N3))
+                    trial = np.array(self.crossover(mutated_temp, target_temp, self.N1 + self.N3))
                     if self.check_length2(trial):
                         break
 
                 # Compute objective function value for target vector]
-                obj_target = self.f(target_temp, self.N1+self.N3, self.N1+self.N3)
+                obj_target = self.f(target_temp, self.N1 + self.N3, self.N1 + self.N3)
                 # Compute objective function value for trial vector
-                obj_trial = self.f(trial, self.N1+self.N3, self.N1+self.N3)
+                obj_trial = self.f(trial, self.N1 + self.N3, self.N1 + self.N3)
 
                 # SELECTION
                 # Perform selection
@@ -176,7 +178,7 @@ class DE_Best_1:
             for i in range(self.N3+1):
                 pipe_b3.append(self.bounds3[:, 0] + (np.random.rand(self.pop_size, len(self.bounds3)) * (self.bounds3[:, 1] - self.bounds3[:, 0])))
             best_pipe_b3 = self.get_pipe_length2(pipe_b3)
-            if(best_pipe_b3 != [] and len(best_pipe_b3) > 3):
+            if(best_pipe_b3 != [] and len(best_pipe_b3) > 4):
                 break
         return best_pipe_b3
     
@@ -241,16 +243,15 @@ class DE_Best_1:
         self.best_b1 = self.get_best_b1()
         print(self.best_b1)    
         return self.best_b1_b2
-        
     
     # Fungsi differential evolution untuk pipe branch 1 dan branch 2
     def diff_evol1(self, pop_pipe, pop_size):
         # Check inequality
-        pop_pipe = [self.check_inequality(p) for p in pop_pipe]
-        pop_pipe = np.array(pop_pipe)
-        
+        pop_pipes = [self.check_inequality(p) for p in pop_pipe]
+        pop_pipe = np.array(pop_pipes)
+
         # Evaluate initial population candidate solution
-        obj_all = [self.f(p, self.N1+self.N2, self.N1+self.N2) for p in pop_pipe]
+        obj_all = [self.f(p, self.N1 + self.N2, self.N1 + self.N2) for p in pop_pipe]
 
         # Find the best vector of initial population
         best_vector = pop_pipe[np.argmin(obj_all)]
@@ -262,34 +263,35 @@ class DE_Best_1:
             for j in range(pop_size):
                 # MUTATION
                 while(True):
-                    # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
+                    # Choose 3 candidate solution : a, b, c, d, e.
+                    a = pop_pipe[j] # current
+                    c = pop_pipe[j] # current
+                    # Choose 5 candidate solution : a, b, c, d, e
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]
+                    d, e, b = pop_pipe[np.random.choice(candidates, 3, replace=False)]
                     # Perform mutation
-                    mutated = self.mutation([a, b, c])
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated_b1 = self.check_bounds(mutated[:3], self.bounds1)
                     mutated_b2 = self.check_bounds(mutated[3:], self.bounds2)
                     mutated = np.concatenate((mutated_b1, mutated_b2))
                     # Check inequality const
                     mutated = self.check_inequality(mutated)
-                        # Check lenght, if true continue, else LOOP UNTIL 
+                        # Check lenght, if true continue, else LOOP UNTIL
                     if self.check_length1(mutated):
                         break
 
                 # CROSSOVER
                 # Perform crossover
                 while(True):
-                    trial = np.array(self.crossover(mutated, pop_pipe[j], self.N1+self.N2))
+                    trial = np.array(self.crossover(mutated, pop_pipe[j], self.N1 + self.N2))
                     if self.check_length1(trial):
                         break
 
                 # Compute objective function value for target vector
-                obj_target = self.f(pop_pipe[j], self.N1+self.N2, self.N1+self.N2)
+                obj_target = self.f(pop_pipe[j], self.N1 + self.N2, self.N1 + self.N2)
                 # Compute objective function value for trial vector
-                obj_trial = self.f(trial, self.N1+self.N2, self.N1+self.N2)
+                obj_trial = self.f(trial, self.N1 + self.N2, self.N1 + self.N2)
 
                 # SELECTION
                 # Perform selection
@@ -309,7 +311,7 @@ class DE_Best_1:
             # Print progress iteration
             # print('Iteration %d : f[%s] = %.5f' % (i, np.around(best_vector, decimals=5), best_obj))
             # print('--------------------')
-            
+
         return [best_vector, best_obj]
 
     def get_best_pipe_b1_b2(self):
@@ -326,7 +328,7 @@ class DE_Best_1:
             pipe_b2 = []
             for i in range(self.N2+1):
                 pipe_b2.append(self.bounds2[:, 0] + (np.random.rand(self.pop_size, len(self.bounds2)) * (self.bounds2[:, 1] - self.bounds2[:, 0])))
-            # Concatenate population pipe branch 1 and branch 2 
+            # Concatenate population pipe branch 1 and branch 2
             pipe_b1_b2 = np.concatenate((pipe_b1, pipe_b2))
             # Get all pipes whichs meet constraint length branch 1 and branch 2
             best_pipe_b1_b2 = self.get_pipe_length1(pipe_b1_b2)
@@ -428,9 +430,9 @@ class DE_Best_1:
         # Generate Trial Vector dari binomial crossover
         trial = [mutated[i] if p[i] < self.CR else target[i] for i in range(dims)]
         return trial
-
+    
     # Fungsi untuk Mutation
     # Input : target pipe dan F
     # Output : mutated vector
     def mutation(self, x):
-        return np.add(x[0], np.multiply(self.F, np.subtract(x[1], x[2])))
+        return np.add(x[0], np.add(np.multiply(self.F, np.subtract(x[1], x[2])), np.multiply(self.F, np.subtract(x[3], x[4]))))

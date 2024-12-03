@@ -1,5 +1,5 @@
 import numpy as np
-class DE_Best_1:
+class DE_Rand_2:
     def __init__(self, ps, length_b1_b2, length_b1_b3, ps1, ps2):
         # Definisi parameter untuk Differential Evolution
         # ------------------------------
@@ -117,12 +117,10 @@ class DE_Best_1:
             for j in range(pop_size):
                 # MUTATION
                 while(True):
-                    # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
+                    # Choose 5 candidate solution : a, b, c, d, e
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]# Perform mutation
-                    mutated = self.mutation([a, b, c])
+                    a, b, c, d, e = pop_pipe[np.random.choice(candidates, 5, replace=False)]
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated = self.check_bounds(mutated, bounds)
                     # Check inequality const
@@ -176,7 +174,7 @@ class DE_Best_1:
             for i in range(self.N3+1):
                 pipe_b3.append(self.bounds3[:, 0] + (np.random.rand(self.pop_size, len(self.bounds3)) * (self.bounds3[:, 1] - self.bounds3[:, 0])))
             best_pipe_b3 = self.get_pipe_length2(pipe_b3)
-            if(best_pipe_b3 != [] and len(best_pipe_b3) > 3):
+            if(best_pipe_b3 != [] and len(best_pipe_b3) > 5):
                 break
         return best_pipe_b3
     
@@ -248,7 +246,7 @@ class DE_Best_1:
         # Check inequality
         pop_pipe = [self.check_inequality(p) for p in pop_pipe]
         pop_pipe = np.array(pop_pipe)
-        
+
         # Evaluate initial population candidate solution
         obj_all = [self.f(p, self.N1+self.N2, self.N1+self.N2) for p in pop_pipe]
 
@@ -262,20 +260,18 @@ class DE_Best_1:
             for j in range(pop_size):
                 # MUTATION
                 while(True):
-                    # Choose 3 candidate solution : a, b, c.
-                    # Xbest, X1, X2
-                    a = pop_pipe[np.argmin(obj_all)]
+                    # Choose 5 candidate solution : a, b, c, d, e
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
-                    b, c = pop_pipe[np.random.choice(candidates, 2, replace=False)]
+                    a, b, c, d, e = pop_pipe[np.random.choice(candidates, 5, replace=False)]
                     # Perform mutation
-                    mutated = self.mutation([a, b, c])
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated_b1 = self.check_bounds(mutated[:3], self.bounds1)
                     mutated_b2 = self.check_bounds(mutated[3:], self.bounds2)
                     mutated = np.concatenate((mutated_b1, mutated_b2))
                     # Check inequality const
                     mutated = self.check_inequality(mutated)
-                        # Check lenght, if true continue, else LOOP UNTIL 
+                        # Check lenght, if true continue, else LOOP UNTIL
                     if self.check_length1(mutated):
                         break
 
@@ -309,7 +305,7 @@ class DE_Best_1:
             # Print progress iteration
             # print('Iteration %d : f[%s] = %.5f' % (i, np.around(best_vector, decimals=5), best_obj))
             # print('--------------------')
-            
+
         return [best_vector, best_obj]
 
     def get_best_pipe_b1_b2(self):
@@ -433,4 +429,4 @@ class DE_Best_1:
     # Input : target pipe dan F
     # Output : mutated vector
     def mutation(self, x):
-        return np.add(x[0], np.multiply(self.F, np.subtract(x[1], x[2])))
+        return np.add(x[0], np.multiply(self.F, np.add(np.subtract(x[1], x[2]), np.subtract(x[3], x[4]))))

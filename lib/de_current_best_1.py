@@ -48,7 +48,7 @@ class DE_Current_Best_1:
         print(self.best_all)
         print(Q)
         print(self.cost)
-    
+        
     def get_q(self):
         qi = []
         
@@ -367,14 +367,12 @@ class DE_Current_Best_1:
     # Input: 1 set pipe (pipe1, pipe2, ..., pipei), jumlah compressor, jumlah pipe
     # Output: sum fungsi objektif
     def f(self, pop, n, m):
-        sum_comp = 0
+        sum = 0
         for i in range(n):
-            qi = self.q(pop[i][0], pop[i][1], pop[i][2], pop[i][3]) / 1000000
-            sum_comp += self.f_comp(pop[i], qi)
-        sum_pipe = 0
-        for j in range(m):
-            sum_pipe += self.f_pipe(pop[j])
-        sum = sum_comp + sum_pipe
+            qi = self.q(pop[i][0],pop[i][1],pop[i][2],pop[i][3])/1000000
+            sum += self.f_comp(pop[i], qi)
+            for j in range(m):
+                sum += self.f_pipe(pop[j])
         return sum
 
     # Fungsi Q untuk menghitung Flow Rate
