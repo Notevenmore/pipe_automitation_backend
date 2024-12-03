@@ -41,7 +41,21 @@ class DE_Best_2:
         best_b1_b2 = self.get_best_b1_b2()
         best_b1_b3 = self.get_best_b1_b3()
         self.best_all = np.concatenate((best_b1_b2[0],best_b1_b3[0][3:]))
+        Q = np.array(self.get_q())
+        self.best_all = np.concatenate((self.best_all, Q.reshape(-1, 1)), axis=1)
         self.K = self.get_k()
+        self.cost = self.f(self.best_all, self.n, self.m)
+        print(self.best_all)
+        print(Q)
+        print(self.cost)
+        
+    def get_q(self):
+        qi = []
+        
+        for i in range(len(self.best_all)):
+            qi.append(self.q(self.best_all[i][0], self.best_all[i][1], self.best_all[i][2], self.best_all[i][3]) / 1000000)
+            
+        return qi
     
     def get_k(self):
         # TODO 1. Hitung K
@@ -54,23 +68,41 @@ class DE_Best_2:
         return K
     
     def get_best_b1_b3(self):
-        best_b1 = self.get_best_b1()
+        threshold_error = 0.05
         while(True):
             best_pipe_b3 = self.create_pipe_b3()
-            best_b1_b3 = self.diff_evol_2(best_pipe_b3, best_b1, self.bounds3, len(best_pipe_b3))
+            best_b1_b3 = self.diff_evol_2(best_pipe_b3, self.best_b1, self.bounds3, len(best_pipe_b3))
             status = False
-            if(round(best_b1_b3[0][self.N1+self.N3-1][1]) == 300):
-                status = True
-            if status and (best_b1_b3[0][:3] == best_b1).all() and self.check_inequality_2(best_b1_b3[0]):
-                break
             
-        return best_b1_b3
+            current_value = best_b1_b3[0][self.N1 + self.N3-1][1]
+            error_rel = abs(current_value - self.ps2) / self.ps2
+            
+            if error_rel > threshold_error:
+                print(f"Skipping, error terlalu tinggi: {error_rel:.2%}")
+                best_pipe_b3 = self.create_pipe_b3()
+                continue
+            
+            if self.check_inequality_2(best_b1_b3[0]):
+            
+                if round(best_b1_b3[0][self.N1 + self.N3-1][1]) == self.ps2:
+                    status = True
+                
+                print(best_b1_b3)
+                if status and (best_b1_b3[0][:3] == self.best_b1).all():
+                    self.best_b1_b3 = best_b1_b3
+                    print("--------break here----------")
+                    break   
+                
+            else :
+                print("check_inequality_2 tidak terpenuhi")          
+           
+        return self.best_b1_b3
     
     def diff_evol_2(self, pop_pipe_b3, best_b1, bounds, pop_size):
-         # Check inequality branch 3
+        # Check inequality branch 3
         pop_pipe = [self.check_inequality(p) for p in pop_pipe_b3]
         pop_pipe = np.array(pop_pipe)
-
+        
         # Evaluate initial population candidate solution
         temp = [np.concatenate((best_b1, p)) for p in pop_pipe_b3]
         obj_all = [self.f(p, self.N1+self.N3, self.N1+self.N3) for p in temp]
@@ -80,7 +112,7 @@ class DE_Best_2:
         best_obj = min(obj_all)
         prev_obj = best_obj
 
-        for i in range(iter):
+        for i in range(self.iter):
             # Iterate over all candidate solution
             for j in range(pop_size):
                 # MUTATION
@@ -91,13 +123,12 @@ class DE_Best_2:
                     # Choose 5 candidate solution : a, b, c, d, e
                     candidates = [candidate for candidate in range(pop_size) if candidate != j]
                     b, c, d, e = pop_pipe[np.random.choice(candidates, 4, replace=False)]
-                    # Perform mutation
-                    mutated = self.mutation([a, b, c, d, e], self.F)
+                    mutated = self.mutation([a, b, c, d, e])
                     # Check bound mutated vector
                     mutated = self.check_bounds(mutated, bounds)
                     # Check inequality const
                     mutated = self.check_inequality(mutated)
-                    # Check lenght, if true continue, else LOOP UNTIL
+                    # Check lenght, if true continue, else LOOP UNTIL 
                     temp = np.concatenate((best_b1, mutated))
                     if self.check_length2(temp):
                         break
@@ -183,12 +214,34 @@ class DE_Best_2:
         return best_b1
     
     def get_best_b1_b2(self):
+        threshold_error = 0.05
         best_pipe_b1_b2 = self.get_best_pipe_b1_b2()
+        # Proses Differential Evolution hingga memenuhi setiap constraint
+        # Hingga memenuhi Ps demand 1 = 600 psi
         while(True):
-            best_b1_b2 = self.diff_evol1(self.best_pipe_b1_b2, len(best_pipe_b1_b2))   
+            best_b1_b2 = self.diff_evol1(best_pipe_b1_b2, len(best_pipe_b1_b2))
             status = False
-            if(round(best_b1_b2[0][self.N1+self.N2-1][1]) == 600 and self.check_inequality_2(best_b1_b2[0])):
-                break
+            
+            current_value = best_b1_b2[0][self.N1 + self.N2 - 1][1]
+            error_rel = abs(current_value - self.ps1) / self.ps1
+
+            if error_rel > threshold_error:
+                print(f"Skipping, error terlalu tinggi: {error_rel:.2%}")
+                best_pipe_b1_b2 = self.get_best_pipe_b1_b2()
+                continue 
+            
+            if self.check_inequality_2(best_b1_b2[0]):
+                print(best_b1_b2)   
+                if round(best_b1_b2[0][self.N1 + self.N2 - 1][1]) == self.ps1:
+                    self.best_b1_b2 = best_b1_b2
+                    print("--------break here----------")
+                    break  
+            else :
+                print("check_inequality_2 tidak terpenuhi")
+            
+        self.best_b1 = self.get_best_b1()
+        print(self.best_b1)    
+        return self.best_b1_b2
         
     
     # Fungsi differential evolution untuk pipe branch 1 dan branch 2
