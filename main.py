@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 origins = [
-  "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:8000", # for testing purposes
 ]
 
@@ -34,12 +34,6 @@ async def automated(data: Requested):
     ps1 = data.ps1
     ps2 = data.ps2
     requested = data.requested
-    print(ps)
-    print(length_b1_b2)
-    print(length_b1_b3)
-    print(ps1)
-    print(ps2)
-    print(requested)
     try:
       if(requested == "de_best_1"):
         result = DE_Best_1(ps, length_b1_b2, length_b1_b3, ps1, ps2)
