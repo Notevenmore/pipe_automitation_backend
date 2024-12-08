@@ -1,5 +1,5 @@
 ### Automated
-POST http://localhost:8000/automated
+POST http://localhost:8000/api/automated
 Content-Type: application/json
 
 {
@@ -8,5 +8,5 @@ Content-Type: application/json
   "length_b1_b3": 200,
   "ps1": 600,
   "ps2": 300,
-  "requested": "de_current_best_1"
+  "requested": "de_rand_best_1"
 }
