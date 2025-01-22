@@ -6,14 +6,9 @@ from encoders import custom_jsonable_encoder as cje
 
 app = FastAPI()
 
-# origins = [
-#     "http://127.0.0.1:3001",
-#     "http://localhost:3000",  # Ensure this is included for testing
-# ]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],  # Make sure this matches the actual domain you're sending requests from
+    allow_origins=['*'], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,7 +23,7 @@ class Requested(BaseModel):
   requested: str
 
 
-@app.post("/api/automated")
+@app.post("/gasnet/api/automated")
 async def automated(data: Requested):
     ps = data.ps
     length_b1_b2 = data.length_b1_b2
